@@ -1,0 +1,180 @@
+Пошаговое построение приложения Web Flow
+Шаг 1 - Добавить зависимость на Spring Web Flow.
+Открыть корневой файл pom.xml и добавить блок настроек и зависимостей:
+
+        <!-- Spring Web Flow -->
+        <dependency>
+            <groupId>org.springframework.webflow</groupId>
+            <artifactId>spring-webflow</artifactId>
+            <version>2.4.5.RELEASE</version>
+        </dependency>
+
+Шаг 2 - Добавить все необходимы зависимости для Spring MVC.
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+Шаг 3* - создание нового модуля
+
+1)	Создать новый модуль File - New - Module
+2)	Тип - "Maven"
+3)	Add as module to  - flowtimes
+4)	Parent - flowtimes
+5)	ArtifactId - flowtimes-web
+6)	Module name - flowtimes-web
+
+Шаг 4 - создание каркаса web приложения
+
+7)	В папке main, на уровне java и resources, создать папку webapp
+8)	В папке webapp создать две директории static (для ресурсов веб приложения) и WEB-INF
+9)	В папке WEB-INF необходимо создать основной конфигурационный файл веб приложение - web.xml
+10)	Заполнить файл содержимым:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+    <!-- Имя нашего приложения -->
+    <display-name>CraftyCat</display-name>
+
+    <!-- Первое что мы делаем - определяем диспетчер сервлет, он будет отвечать за обработку входящих запросов -->
+    <servlet>
+        <servlet-name>craftycat</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>
+                /WEB-INF/flow-beans.xml
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Второе - определяем маппинг нашего сервлета -->
+    <servlet-mapping>
+        <servlet-name>craftycat</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- Третье - определение слушателя контекста, чтобы можно было добавлять файлы в контекст спринга-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- Чтобы аннотации подхватывались -->
+    <context-param>
+        <param-name>contextClass</param-name>
+        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </context-param>
+
+    <!--Чтобы показать где сидит наша конфигурация-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            ru.craftycat.CraftyCatConfig
+        </param-value>
+    </context-param>
+
+</web-app>
+
+Шаг 5 - снастройка контекста.
+На уровне web.xml создать файл flow-beans.xml.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:flow="http://www.springframework.org/schema/webflow-config"
+       xsi:schemaLocation="http://www.springframework.org/schema/webflow-config
+       http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.0.xsd
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+</beans>
+
+Шаг 6 - Исполнитель последовательности
+
+<!-- 1) определение главного исполнителя последовательности -->
+<flow:flow-executor id="flowExecutor" flow-registry="flowRegistry"/>
+
+Шаг 7 - Реестр последовательности
+
+<!-- 2) определение реестра последовательностей -->
+    <!-- Пример определение конкретной последовательностей -->
+    <!--<flow:flow-registry id="flowRegistry" flow-builder-services="flowBuilderServices">-->
+    <!--<flow:flow-location id="crafty" path="/WEB-INF/flows/crafty.xml" />-->
+    <!--</flow:flow-registry>-->
+
+
+    <!-- Пример определение реестра последовательностей по маске -->
+    <flow:flow-registry id="flowRegistry" flow-builder-services="flowBuilderServices" base-path="/WEB-INF/flows">
+        <flow:flow-location-pattern value="**/*-flow.xml"/>
+    </flow:flow-registry>
+
+Какой путь слушает наша последовательность?
+
+Шаг 8 - Делегирование обработки последовательностей
+
+    <!-- 3) определение необходимых для поиска последовательностей и их выполнения компонентов -->
+    <!-- Делегирование обработки последовательностей от DispatcherServlet (поиск пути) -->
+    <bean class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping">
+        <property name="flowRegistry" ref="flowRegistry" />
+    </bean>
+
+Шаг 9 - Выполнение последовательности
+
+    <!-- Делегирование обработки последовательностей от DispatcherServlet (непосредственное выполнение) -->
+    <bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
+        <property name="flowExecutor" ref="flowExecutor" />
+    </bean>
+
+    <!-- 4) определение builder'а для распознавания ftl шаблонов в качестве представления последовательности -->
+    <flow:flow-builder-services id="flowBuilderServices" view-factory-creator="mvcViewFactoryCreator"/>
+
+    <bean id="mvcViewFactoryCreator" class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator">
+        <property name="viewResolvers" ref="freemarkerViewResolver"/>
+    </bean>
+
+Шаг 10 - Описание последовательности.
+
+В папке WEB-INF создать папку flows, в ней файл crafty-flow.xml.
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+		http://www.springframework.org/schema/webflow
+		http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+</flow>
+
+Шаг 11 - Заполнение файла описания последовательности.
+1) создайте переменную search типа SearchData.
+2) создайте состояние-представление с id = welcome, которое будет отображать страницу startSearch,
+    по нажатию на кнопку осуществлять переход на состояние searchByData,
+    по событию cancel - переход на endState
+3) создайте состояние-действие с id = searchByData,
+    переменной search присвойте результат вызова метода searchPersonByData класса FlowTimesFlowActions
+    ПОДСКАЗКА: параметр метода возьми из requestParameters.searchString.
+    если вылетит исключение (java.lang.Exception) - переход на endState
+    иначе переход на showResult.
+4) создайте состояние-представление с id = showResult, model = search,
+    по событию cancel переход на endState
+5) создайте конец с id = endState
+
+Путь для проверки http://localhost:8080/search-flow
+
+ВОПРОС: как сделать, чтобы слушался путь test?

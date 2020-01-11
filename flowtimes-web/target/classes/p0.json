@@ -1,0 +1,14 @@
+{
+  "surname": "Попова",
+  "name": "Елена",
+  "patronymic": "",
+  "sex": "Ж",
+  "age": 23,
+  "city": "Рязань",
+  "phone": 89105559999,
+  "mail": "popova_e_a@gmail.com",
+  "company": "СБТ",
+  "skills": "java, openshift",
+  "hobby": "Путешествия, программирование",
+  "driverLicense": true
+}

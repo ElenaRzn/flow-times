@@ -1,0 +1,14 @@
+{
+  "surname": "Ермаков",
+  "name": "Алексей",
+  "patronymic": "",
+  "sex": "M",
+  "age": 24,
+  "city": "Рязань",
+  "phone": 89009009999,
+  "mail": "xalex1995x@gmail.com",
+  "company": "СБТ",
+  "skills": "html pl/sql js java c# php",
+  "hobby": "Чтение программирование",
+  "driverLicense": true
+}

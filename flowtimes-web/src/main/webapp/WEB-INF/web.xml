@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+    <!-- Имя нашего приложения -->
+    <display-name>FlowTimes</display-name>
+
+    <!-- Первое что мы делаем - определяем диспетчер сервлет, он будет отвечать за обработку входящих запросов -->
+    <servlet>
+        <servlet-name>flowtimes</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>
+                /WEB-INF/flow-beans.xml
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Второе - определяем маппинг нашего сервлета -->
+    <servlet-mapping>
+        <servlet-name>flowtimes</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- Третье - определение слушателя контекста, чтобы можно было добавлять файлы в контекст спринга-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- Чтобы аннотации подхватывались -->
+    <context-param>
+        <param-name>contextClass</param-name>
+        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </context-param>
+
+    <!--Чтобы показать где сидит наша конфигурация-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            ru.sbt.javaschool.config.FlowTimesConfig
+        </param-value>
+    </context-param>
+
+</web-app>
