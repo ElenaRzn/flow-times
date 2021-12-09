@@ -17,7 +17,7 @@
     <properties>
         <spring.version>5.0.4.RELEASE</spring.version>
         <jetty.version>9.2.19.v20160908</jetty.version>
-        <jackson.version>2.9.2</jackson.version>
+        <jackson.version>2.9.10.8</jackson.version>
         <lombok.version>1.16.18</lombok.version>
     </properties>
 
